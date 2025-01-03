@@ -1,0 +1,8 @@
+clickhouse:
+  hosts:
+    clickhouse-server-1:
+    clickhouse-server-2:
+
+lighthouse:
+  hosts:
+    lighthouse-server-1:
