@@ -1,8 +1,7 @@
 clickhouse:
   hosts:
-    clickhouse-server-1:
-    clickhouse-server-2:
+    localhost:
 
 lighthouse:
   hosts:
-    lighthouse-server-1:
+    localhost:
