@@ -32,5 +32,42 @@
     - name: Create database
       ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
       register: create_db
-      failed_when: create_db.rc != 0 and create_db.rc !=82
+      failed_when: create_db.rc != 0 and create_db.rc != 82
       changed_when: create_db.rc == 0
+
+- name: Install and configure LightHouse
+  hosts: lighthouse
+  tasks:
+    - name: Download LightHouse static files
+      ansible.builtin.get_url:
+        url: "https://example.com/path/to/lighthouse-static.zip"
+        dest: "/tmp/lighthouse-static.zip"
+
+    - name: Unzip LightHouse static files
+      ansible.builtin.unarchive:
+        src: "/tmp/lighthouse-static.zip"
+        dest: "/var/www/lighthouse"
+        remote_src: yes
+
+    - name: Install Nginx
+      ansible.builtin.yum:
+        name: nginx
+        state: present
+
+    - name: Configure Nginx for LightHouse
+      ansible.builtin.template:
+        src: "nginx-lighthouse.conf.j2"
+        dest: "/etc/nginx/conf.d/lighthouse.conf"
+      notify: Restart nginx
+
+    - name: Start Nginx service
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+
+  handlers:
+    - name: Restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
