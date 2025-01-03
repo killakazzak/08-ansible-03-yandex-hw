@@ -9,26 +9,29 @@
         state: restarted
   tasks:
     - block:
-        - name: Get clickhouse distrib
+        - name: Get Clickhouse distribution
           ansible.builtin.get_url:
             url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.noarch.rpm"
             dest: "./{{ item }}-{{ clickhouse_version }}.rpm"
+            mode: "0644" # Установка прав доступа
           with_items: "{{ clickhouse_packages }}"
       rescue:
-        - name: Get clickhouse distrib
+        - name: Get fallback Clickhouse distribution
           ansible.builtin.get_url:
             url: "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-{{ clickhouse_version }}.x86_64.rpm"
             dest: "./clickhouse-common-static-{{ clickhouse_version }}.rpm"
-    - name: Install clickhouse packages
+            mode: "0644" # Установка прав доступа
+    - name: Install Clickhouse packages
       become: true
-      ansible.builtin.yum:
+      ansible.builtin.dnf: # Используем FQCN для dnf
         name:
           - clickhouse-common-static-{{ clickhouse_version }}.rpm
           - clickhouse-client-{{ clickhouse_version }}.rpm
           - clickhouse-server-{{ clickhouse_version }}.rpm
       notify: Start clickhouse service
     - name: Flush handlers
-      meta: flush_handlers
+      ansible.builtin.meta: # Используем FQCN для meta
+        flush_handlers
     - name: Create database
       ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
       register: create_db
@@ -42,15 +45,16 @@
       ansible.builtin.get_url:
         url: "https://example.com/path/to/lighthouse-static.zip"
         dest: "/tmp/lighthouse-static.zip"
+        mode: "0644" # Установка прав доступа
 
     - name: Unzip LightHouse static files
       ansible.builtin.unarchive:
         src: "/tmp/lighthouse-static.zip"
         dest: "/var/www/lighthouse"
-        remote_src: yes
+        remote_src: true
 
     - name: Install Nginx
-      ansible.builtin.yum:
+      ansible.builtin.dnf: # Используем FQCN для dnf
         name: nginx
         state: present
 
@@ -58,6 +62,7 @@
       ansible.builtin.template:
         src: "nginx-lighthouse.conf.j2"
         dest: "/etc/nginx/conf.d/lighthouse.conf"
+        mode: "0644" # Установка прав доступа
       notify: Restart nginx
 
     - name: Start Nginx service
