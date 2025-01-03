@@ -56,10 +56,9 @@ Playbook поддерживает следующие теги:
 Для запуска playbook используйте следующую команду:
 
 ```bash
-ansible-playbook -i inventory_file playbook.yml --extra-vars "clickhouse_version=22.3.3.3 clickhouse_packages=['clickhouse-client', 'clickhouse-server']" --tags "clickhouse"
+ansible-playbook -i prod.yml site.yml --extra-vars "clickhouse_version=22.3.3.3 clickhouse_packages=['clickhouse-client', 'clickhouse-server']" --tags "clickhouse"
 ```
 
-Замените `inventory_file` на путь к вашему инвентарному файлу и `playbook.yml` на имя вашего playbook.
 
 ## Примечания
 
